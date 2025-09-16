@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Github, Twitter, Linkedin, Mail } from "lucide-react";
 import { APP_CONFIG } from '../../../config';
+import Logo from "@/components/ui/logo";
 /**
  * Footer Component
  * 
@@ -22,12 +23,7 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded bg-gray-900 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">N</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">{APP_CONFIG.name}</span>
-            </div>
+            <Logo size="md" showText={true} />
             <p className="text-sm text-gray-600 max-w-xs">
               {APP_CONFIG.description}
             </p>

@@ -15,6 +15,19 @@ export const APP_CONFIG = {
     url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
     version: '1.0.0',
     
+    // Logo configuration
+    logo: {
+      backgroundColor: '#1f2937', // gray-800
+      textColor: '#ffffff', // white
+      roundness: 'rounded', // Tailwind CSS class: 'rounded-none', 'rounded-sm', 'rounded', 'rounded-md', 'rounded-lg', 'rounded-xl', 'rounded-2xl', 'rounded-3xl', 'rounded-full'
+      type: 'icon', // 'letter' or 'icon'
+      firstLetter: "N", // Used when type is 'letter'
+      icon: 'Zap', // Lucide icon name (used when type is 'icon')
+      get name() {
+        return APP_CONFIG.name;
+      }
+    },
+    
     // Contact information
     contact: {
       email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@example.com',

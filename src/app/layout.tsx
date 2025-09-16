@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { APP_CONFIG } from '../../config';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Your Next.js Template",
-  description: "A comprehensive Next.js template with shadcn/ui, Supabase, and Stripe integration",
+  title: APP_CONFIG.name,
+  description: APP_CONFIG.description,
+  icons: {
+    icon: '/api/favicon',
+  },
 };
 
 export default function RootLayout({

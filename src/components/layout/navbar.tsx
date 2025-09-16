@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogIn } from "lucide-react";
-import { APP_CONFIG } from '../../../config';
+import Logo from "@/components/ui/logo";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,14 +17,7 @@ export default function Navbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo/Brand */}
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded bg-gray-900 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">N</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">{APP_CONFIG.name}</span>
-            </Link>
-          </div>
+          <Logo size="md" showText={true} />
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
