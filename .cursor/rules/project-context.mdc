@@ -1,0 +1,55 @@
+---
+description: Pproject context and tech stack
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Next.js Template
+
+## Tech Stack
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Components**: shadcn/ui
+- **Database**: Supabase
+- **Payments**: Stripe
+- **Icons**: Lucide React
+- **State Management**: React hooks (useState, useEffect)
+- **Authentication**: Supabase Auth
+- **Deployment**: Vercel (recommended)
+
+## Project Structure
+- Uses Next.js App Router (src/app/)
+- Components in src/components/
+- UI components from shadcn/ui in src/components/ui/
+- Layout components in src/components/layout/
+- Section components in src/components/sections/
+- Utilities in src/lib/
+
+## Code Style
+- Use TypeScript for all files
+- Follow React functional components pattern
+- Use Tailwind CSS for styling
+- Export components as default exports
+- Use proper TypeScript interfaces
+- Follow Next.js best practices
+
+## Key Files
+- src/app/page.tsx - Landing page
+- src/app/dashboard/page.tsx - Dashboard
+- src/app/auth/ - Authentication pages
+- src/components/layout/ - Navigation and footer
+- src/components/sections/ - Landing page sections
+- src/components/ui/ - shadcn/ui components
+
+## Environment Variables
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
+- NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+- STRIPE_SECRET_KEY
+- NEXT_PUBLIC_CONTACT_EMAIL
+
+## Development
+- Uses Turbopack for faster builds
+- ESLint configured for code quality
+- TypeScript strict mode enabled

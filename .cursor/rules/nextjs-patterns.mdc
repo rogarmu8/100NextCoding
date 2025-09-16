@@ -1,0 +1,48 @@
+---
+description: Next.js App Router patterns and best practices
+globs: ["src/app/**/*"]
+alwaysApply: false
+---
+
+# Next.js App Router Patterns
+
+## Page Components
+- Use `page.tsx` for route pages
+- Export as default: `export default function PageName()`
+- Use proper metadata exports for SEO
+
+## Layout Components
+- Use `layout.tsx` for shared layouts
+- Export metadata and layout components
+- Handle client-side features with "use client"
+
+## Authentication Pages
+- Place in `src/app/auth/` directory
+- Use shadcn/ui Card components for forms
+- Include proper form validation
+- Use environment variables for configuration
+
+## API Routes
+- Use `route.ts` files for API endpoints
+- Follow RESTful conventions
+- Include proper error handling
+- Use TypeScript for request/response types
+
+## File Naming
+- Use kebab-case for directories: `auth/sign-in/`
+- Use `page.tsx` for pages
+- Use `layout.tsx` for layouts
+- Use `route.ts` for API routes
+
+## Metadata
+```typescript
+export const metadata: Metadata = {
+  title: "Page Title",
+  description: "Page description",
+};
+```
+
+## Client Components
+- Add "use client" directive when needed
+- Use for interactive features, state, effects
+- Keep server components as default

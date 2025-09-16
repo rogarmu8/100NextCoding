@@ -1,0 +1,54 @@
+---
+description: Component development standards and patterns
+globs: ["src/components/**/*"]
+alwaysApply: false
+---
+
+# Component Development Standards
+
+## React Components
+- Use functional components with TypeScript
+- Export as default exports: `export default function ComponentName()`
+- Use proper TypeScript interfaces for props
+- Follow the pattern: `function ComponentName() { ... } export default ComponentName;`
+
+## Styling Guidelines
+- Use Tailwind CSS for all styling
+- Prefer neutral colors: `bg-white`, `text-gray-900`, `text-gray-600`
+- Use `cursor-pointer` for interactive elements
+- Keep designs simple and clean
+
+## Component Structure
+```typescript
+"use client"; // Only if needed for client-side features
+
+import { ComponentProps } from "@/components/ui/component";
+import { Icon } from "lucide-react";
+
+/**
+ * Component description
+ * 
+ * @component
+ */
+function ComponentName() {
+  return (
+    <div className="component-styles">
+      {/* Component content */}
+    </div>
+  );
+}
+
+export default ComponentName;
+```
+
+## shadcn/ui Integration
+- Use existing shadcn/ui components from src/components/ui/
+- Import with: `import { Component } from "@/components/ui/component"`
+- Extend with additional props when needed
+- Maintain accessibility standards
+
+## Responsive Design
+- Use responsive Tailwind classes: `md:`, `lg:`, `xl:`
+- Test on mobile, tablet, and desktop
+- Use `grid` and `flex` for layouts
+- Ensure touch-friendly interactive elements

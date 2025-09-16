@@ -1,0 +1,34 @@
+---
+description: Styling and design system guidelines
+globs: ["**/*.tsx", "**/*.css"]
+alwaysApply: false
+---
+
+# Styling Guidelines
+
+## Interactive Elements
+- Use `cursor-pointer` for clickable elements
+- Hover states: `hover:text-gray-900`, `hover:bg-gray-50`
+- Focus states for accessibility
+
+## Typography
+- Use semantic heading hierarchy: `h1`, `h2`, `h3`
+- Consistent font sizes: `text-xl`, `text-2xl`, `text-3xl`
+- Proper line heights: `leading-relaxed`, `leading-tight`
+
+## Spacing
+- Use consistent spacing: `space-y-4`, `space-y-6`, `space-y-8`
+- Padding: `p-4`, `p-6`, `p-8`
+- Margins: `mb-4`, `mb-6`, `mb-8`
+
+## Responsive Design
+- Mobile-first approach
+- Breakpoints: `sm:`, `md:`, `lg:`, `xl:`
+- Test on all screen sizes
+- Use `flex` and `grid` for layouts
+
+## Component Styling
+- Use Tailwind utility classes
+- Avoid custom CSS when possible
+- Keep styles close to components
+- Use CSS variables for theming
