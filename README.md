@@ -32,7 +32,6 @@ A comprehensive Next.js template with modern tools and best practices for rapid 
 
 ### Authentication
 - **Sign In/Sign Up** pages with form validation
-- **Social login** placeholders (Google, Facebook)
 - **Responsive design** for mobile and desktop
 
 ### Components
@@ -63,17 +62,13 @@ A comprehensive Next.js template with modern tools and best practices for rapid 
 
 1. **Clone the template**
    ```bash
-   git clone <your-repo-url>
-   cd 100nextcoding
+   git clone https://github.com/rogarmu8/100NextCoding.git
+   cd 100NextCoding
    ```
 
 2. **Install dependencies**
    ```bash
    npm install
-   # or
-   yarn install
-   # or
-   pnpm install
    ```
 
 3. **Set up environment variables**
@@ -81,29 +76,40 @@ A comprehensive Next.js template with modern tools and best practices for rapid 
    cp .env.example .env.local
    ```
    
-   Fill in your environment variables:
+   Open `.env.local` and fill in your actual values:
    ```env
-   # Supabase
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   # Supabase Configuration
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
    
-   # Stripe
-   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
-   STRIPE_SECRET_KEY=your_stripe_secret_key
-   STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+   # Stripe Configuration
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+   STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+   STRIPE_WEBHOOK_SECRET=whsec_your_stripe_webhook_secret
+   STRIPE_PRO_PRICE_ID=price_your_pro_monthly_price_id
+   STRIPE_LIFETIME_PRICE_ID=price_your_lifetime_price_id
+   
+   # Application Configuration
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   NEXT_PUBLIC_CONTACT_EMAIL=contact@example.com
    ```
 
 4. **Run the development server**
    ```bash
    npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
    ```
 
 5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+### Quick Start Guide
+
+**Need help getting your API keys?** Check out our detailed setup guides:
+
+- **Supabase Setup**: Get your project URL and API keys from [supabase.com](https://supabase.com) → Settings → API
+- **Stripe Setup**: Get your keys from [stripe.com](https://stripe.com) → Developers → API keys
+- **Database Schema**: Run the SQL script in `supabase-schema/supabase-schema.sql` in your Supabase SQL Editor
 
 ## 📁 Project Structure
 
@@ -137,14 +143,6 @@ src/
 ### Colors and Theme
 The template uses CSS variables for theming. You can customize colors in `src/app/globals.css`:
 
-```css
-:root {
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  /* ... other colors */
-}
-```
-
 ### Components
 All components are built with shadcn/ui and can be customized by:
 1. Modifying the component files in `src/components/ui/`
@@ -159,18 +157,77 @@ All components are built with shadcn/ui and can be customized by:
 ## 🔧 Configuration
 
 ### Supabase Setup
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Get your project URL and anon key
-3. Add them to your environment variables
-4. Set up your database schema
-5. Configure authentication providers
+
+1. **Create a Supabase project**
+   - Go to [supabase.com](https://supabase.com) and create a new project
+   - Wait for the project to be ready (usually takes 1-2 minutes)
+
+2. **Get your API keys**
+   - Go to Settings → API in your Supabase dashboard
+   - Copy the "Project URL" and "anon public" key
+   - Copy the "service_role" key (keep this secret!)
+
+3. **Set up your database**
+   - Go to the SQL Editor in your Supabase dashboard
+   - Copy and paste the contents of `supabase-schema/supabase-schema.sql`
+   - Click "Run" to create the necessary tables and functions
+
+4. **Update your environment variables**
+   - Add your Supabase keys to `.env.local`
 
 ### Stripe Setup
-1. Create a Stripe account at [stripe.com](https://stripe.com)
-2. Get your publishable and secret keys
-3. Add them to your environment variables
-4. Set up webhooks for your application
-5. Configure products and pricing
+
+1. **Create a Stripe account**
+   - Go to [stripe.com](https://stripe.com) and create an account
+   - Complete the account setup process
+
+2. **Get your API keys**
+   - Go to Developers → API keys in your Stripe dashboard
+   - Copy the "Publishable key" and "Secret key"
+   - Make sure you're using test keys (they start with `pk_test_` and `sk_test_`)
+
+3. **Create products and prices**
+   - Go to Products in your Stripe dashboard
+   - Create a "Pro Plan" product with $12/month recurring price
+   - Create a "Lifetime Plan" product with $99 one-time price
+   - Copy the Price IDs (they start with `price_`)
+
+4. **Set up webhooks**
+   - Go to Developers → Webhooks
+   - Add endpoint: `https://yourdomain.com/api/stripe/webhook`
+   - Select events: `checkout.session.completed`, `customer.subscription.*`, `invoice.payment_*`
+   - Copy the webhook secret (starts with `whsec_`)
+
+5. **Update your environment variables**
+   - Add your Stripe keys and Price IDs to `.env.local`
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**"Module not found" errors**
+- Make sure you ran `npm install` after cloning
+- Delete `node_modules` and `package-lock.json`, then run `npm install` again
+
+**Environment variables not working**
+- Make sure your `.env.local` file is in the root directory (same level as `package.json`)
+- Restart your development server after changing environment variables
+- Check that variable names match exactly (case-sensitive)
+
+**Supabase connection issues**
+- Verify your project URL and API keys are correct
+- Make sure your Supabase project is not paused
+- Check that you've run the database schema script
+
+**Stripe payment issues**
+- Ensure you're using the correct keys for your environment (test or production)
+- Verify your Price IDs are correct and active
+- Check that your webhook endpoint is properly configured
+
+**Build errors**
+- Run `npm run build` to check for TypeScript errors
+- Make sure all environment variables are set in production
+- Check the console for specific error messages
 
 ## 📚 Documentation
 
@@ -195,23 +252,11 @@ The template works with any platform that supports Next.js:
 - DigitalOcean App Platform
 - AWS Amplify
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🆘 Support
 
 - Create an issue for bugs or feature requests
 - Check the documentation for common questions
-- Join our community for discussions
+- Join our 100 Vibe Coding community for discussions
 
 ## 🙏 Acknowledgments
 
