@@ -1,8 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, X } from "lucide-react";
 import { getAllPlans } from "@/lib/pricing";
+import { useAuth } from "@/contexts/auth-context";
 
 /**
  * Pricing Section Component
@@ -12,11 +16,55 @@ import { getAllPlans } from "@/lib/pricing";
  * - Feature comparisons
  * - Call-to-action buttons
  * - Popular plan highlighting
+ * - Dynamic redirects based on auth status
  * 
  * @component
  */
 function Pricing() {
+  const { user, loading } = useAuth();
   const plans = getAllPlans();
+  const [processingPlan, setProcessingPlan] = useState<string | null>(null);
+
+  // Handle plan selection based on authentication status
+  const handlePlanClick = async (planId: string) => {
+    if (loading || processingPlan) return;
+    
+    setProcessingPlan(planId);
+    
+    if (user) {
+      // User is logged in, create Stripe checkout session
+      try {
+        const response = await fetch('/api/stripe/checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            plan: planId,
+            userId: user.id,
+            userEmail: user.email,
+            successUrl: `${window.location.origin}/dashboard?upgraded=true`,
+            cancelUrl: `${window.location.origin}/#pricing`,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.url) {
+          window.location.href = data.url;
+        } else {
+          console.error('Failed to create checkout session:', data.error);
+          setProcessingPlan(null);
+        }
+      } catch (error) {
+        console.error('Error creating checkout session:', error);
+        setProcessingPlan(null);
+      }
+    } else {
+      // User is not logged in, redirect to sign up with plan
+      window.location.href = `/auth/signup?plan=${planId}`;
+    }
+  };
 
   return (
     <section id="pricing" className="py-24 lg:py-32 bg-white">
@@ -83,16 +131,16 @@ function Pricing() {
 
                 {/* CTA Button */}
                 <Button 
-                  className={`w-full ${
+                  className={`w-full hover:cursor-pointer ${
                     plan.popular 
                       ? 'bg-gray-900 hover:bg-gray-800 text-white' 
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
                   }`}
-                  asChild
+                  style={{ cursor: (loading || processingPlan !== null) ? 'not-allowed' : 'pointer' }}
+                  onClick={() => handlePlanClick(plan.id)}
+                  disabled={loading || processingPlan !== null}
                 >
-                  <a href={plan.href}>
-                    {plan.cta}
-                  </a>
+                  {loading ? 'Loading...' : processingPlan === plan.id ? 'Processing...' : plan.cta}
                 </Button>
               </CardContent>
             </Card>

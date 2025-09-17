@@ -66,7 +66,8 @@ export default async function DashboardLayout({
     .eq('id', user.id)
     .single();
 
-    /*
+  /*
+  Uncomment this if you want to restrict access to premium users only to your application
   if (profileError || !userProfile || userProfile.premium === 0) {
     // User doesn't have premium access, redirect to Stripe checkout
     // Create checkout session and redirect
