@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { getCurrentUser, signOut } from '@/lib/auth-utils';
+import { getCurrentUser } from '@/lib/auth-utils';
 import { createClient } from '@/lib/supabase/client';
 
 interface UserProfile {
@@ -10,13 +10,13 @@ interface UserProfile {
   email: string;
   premium: number;
   is_active: boolean;
+  stripe_customer_id?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
-  signOut: () => Promise<void>;
   isPremium: boolean;
 }
 
@@ -28,6 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const supabase = createClient();
+    
     // Get initial user and profile
     const getUser = async () => {
       try {
@@ -36,10 +38,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(user);
           
           // Get user profile from public.users table
-          const supabase = createClient();
           const { data: profile, error: profileError } = await supabase
             .from('users')
-            .select('id, email, premium, is_active')
+            .select('id, email, premium, is_active, stripe_customer_id')
             .eq('id', user.id)
             .single();
           
@@ -55,19 +56,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     getUser();
+
+    // Listen for auth state changes (optimized)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+        
+        if (event === 'SIGNED_IN' && session?.user) {
+          setUser(session.user);
+          setLoading(false);
+          
+          // Fetch profile in background (non-blocking)
+          try {
+            const { data: profile, error: profileError } = await supabase
+              .from('users')
+              .select('id, email, premium, is_active, stripe_customer_id')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (!profileError && profile) {
+              setUserProfile(profile);
+            }
+          } catch (error) {
+            console.error('Error fetching profile:', error);
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          setUserProfile(null);
+          setLoading(false);
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const handleSignOut = async () => {
-    try {
-      const { error } = await signOut();
-      if (!error) {
-        setUser(null);
-        setUserProfile(null);
-      }
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
 
   const isPremium = Boolean(userProfile?.premium && userProfile.premium > 0);
 
@@ -76,7 +101,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user, 
       userProfile, 
       loading, 
-      signOut: handleSignOut, 
       isPremium 
     }}>
       {children}

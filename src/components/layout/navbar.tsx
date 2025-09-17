@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogIn, LogOut, CreditCard, ChevronDown } from "lucide-react";
 import Logo from "@/components/ui/logo";
 import { useAuth } from "@/contexts/auth-context";
+import { signOutAction } from "@/lib/auth-actions";
 
 interface NavbarProps {
   variant?: 'default' | 'dashboard';
@@ -14,11 +15,14 @@ interface NavbarProps {
 export default function Navbar({ variant = 'default' }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, userProfile } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfileDropdown = () => setIsProfileDropdownOpen(!isProfileDropdownOpen);
+
+  // Check if user has a valid Stripe customer ID
+  const hasStripeCustomer = Boolean(userProfile?.stripe_customer_id);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -35,9 +39,27 @@ export default function Navbar({ variant = 'default' }: NavbarProps) {
   }, []);
 
   const handleSignOut = async () => {
-    await signOut();
+    console.log('Navbar: Sign out clicked');
+    
+    // Close dropdowns immediately
     setIsProfileDropdownOpen(false);
     setIsMenuOpen(false);
+    
+    try {
+      // Call server action
+      const result = await signOutAction();
+      
+      if (result.success) {
+        console.log('Navbar: Sign out successful, redirecting...');
+      } else {
+        console.error('Navbar: Sign out failed:', result.error);
+      }
+    } catch (error) {
+      console.error('Navbar: Sign out error:', error);
+    }
+    
+    // Always force a hard redirect to ensure complete page reload and state reset
+    window.location.href = '/';
   };
 
   const handleBilling = async () => {
@@ -120,13 +142,15 @@ export default function Navbar({ variant = 'default' }: NavbarProps) {
                   {isProfileDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                       <div className="py-1">
-                        <button
-                          onClick={handleBilling}
-                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                        >
-                          <CreditCard className="h-4 w-4 mr-3" />
-                          Billing
-                        </button>
+                        {hasStripeCustomer && (
+                          <button
+                            onClick={handleBilling}
+                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                          >
+                            <CreditCard className="h-4 w-4 mr-3" />
+                            Billing
+                          </button>
+                        )}
                         <button
                           onClick={handleSignOut}
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
@@ -210,13 +234,15 @@ export default function Navbar({ variant = 'default' }: NavbarProps) {
                   variant === 'dashboard' ? (
                     // Dashboard variant: Billing and Sign Out only
                     <>
-                      <button
-                        onClick={handleBilling}
-                        className="flex items-center justify-center space-x-2 w-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer"
-                      >
-                        <CreditCard className="h-4 w-4" />
-                        <span>Billing</span>
-                      </button>
+                      {hasStripeCustomer && (
+                        <button
+                          onClick={handleBilling}
+                          className="flex items-center justify-center space-x-2 w-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer"
+                        >
+                          <CreditCard className="h-4 w-4" />
+                          <span>Billing</span>
+                        </button>
+                      )}
                       <button
                         onClick={handleSignOut}
                         className="flex items-center justify-center space-x-2 w-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer"

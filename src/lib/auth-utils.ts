@@ -90,16 +90,76 @@ export async function signIn(data: SignInData): Promise<{ user: any; error: Auth
  */
 export async function signOut(): Promise<{ error: AuthError | null }> {
   try {
+    console.log('auth-utils: Creating Supabase client...');
     const supabase = createClient();
     
-    const { error } = await supabase.auth.signOut();
+    console.log('auth-utils: Calling supabase.auth.signOut()...');
+    
+    // Add timeout to prevent hanging
+    const signOutPromise = supabase.auth.signOut();
+    const timeoutPromise = new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error('Sign out timeout after 3 seconds')), 3000)
+    );
+    
+    const result = await Promise.race([signOutPromise, timeoutPromise]);
+    console.log('auth-utils: Sign out completed, result:', result);
 
-    if (error) {
-      return { error: { message: error.message, code: error.message } };
+    if (result.error) {
+      console.error('auth-utils: Sign out error:', result.error);
+      return { error: { message: result.error.message, code: result.error.message } };
     }
 
+    console.log('auth-utils: Sign out successful');
     return { error: null };
   } catch (error) {
+    console.error('auth-utils: Unexpected error during sign out:', error);
+    
+    // If it's a timeout error, we need to force clear the session
+    if (error instanceof Error && error.message.includes('timeout')) {
+      console.log('auth-utils: Sign out timed out, forcing session clear...');
+      
+      try {
+        // Force clear local session data
+        const supabase = createClient();
+        
+        // Clear all auth-related data from localStorage
+        if (typeof window !== 'undefined') {
+          const keys = Object.keys(localStorage);
+          keys.forEach(key => {
+            if (key.startsWith('sb-') || key.includes('supabase')) {
+              localStorage.removeItem(key);
+            }
+          });
+          
+          // Also clear sessionStorage
+          const sessionKeys = Object.keys(sessionStorage);
+          sessionKeys.forEach(key => {
+            if (key.startsWith('sb-') || key.includes('supabase')) {
+              sessionStorage.removeItem(key);
+            }
+          });
+        }
+        
+        // Try to clear the session one more time with a shorter timeout
+        const quickSignOut = supabase.auth.signOut();
+        const quickTimeout = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Quick sign out timeout')), 1000)
+        );
+        
+        try {
+          await Promise.race([quickSignOut, quickTimeout]);
+          console.log('auth-utils: Quick sign out successful');
+        } catch (quickError) {
+          console.log('auth-utils: Quick sign out also timed out, but localStorage cleared');
+        }
+        
+        return { error: null };
+      } catch (forceError) {
+        console.error('auth-utils: Error during forced session clear:', forceError);
+        return { error: null }; // Still return success since we cleared localStorage
+      }
+    }
+    
     return { 
       error: { message: 'An unexpected error occurred during sign out' } 
     };
