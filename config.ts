@@ -20,7 +20,7 @@ export const APP_CONFIG = {
       backgroundColor: '#1f2937', // gray-800
       textColor: '#ffffff', // white
       roundness: 'rounded', // Tailwind CSS class: 'rounded-none', 'rounded-sm', 'rounded', 'rounded-md', 'rounded-lg', 'rounded-xl', 'rounded-2xl', 'rounded-3xl', 'rounded-full'
-      type: 'icon', // 'letter' or 'icon'
+      type: 'letter', // 'letter' or 'icon'
       firstLetter: "N", // Used when type is 'letter'
       icon: 'Zap', // Lucide icon name (used when type is 'icon')
       get name() {
