@@ -66,12 +66,24 @@ A comprehensive Next.js template with modern tools and best practices for rapid 
    cd 100NextCoding
    ```
 
-2. **Install dependencies**
+2. **Set up your own repository**
+   ```bash
+   # Remove the original remote origin
+   git remote remove origin
+   
+   # Add your own repository as the new origin
+   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+   
+   # Push to your repository
+   git push -u origin main
+   ```
+
+3. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Set up environment variables**
+4. **Set up environment variables**
    ```bash
    cp .env.example .env.local
    ```
@@ -95,12 +107,12 @@ A comprehensive Next.js template with modern tools and best practices for rapid 
    NEXT_PUBLIC_CONTACT_EMAIL=contact@example.com
    ```
 
-4. **Run the development server**
+5. **Run the development server**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser**
+6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ### Quick Start Guide

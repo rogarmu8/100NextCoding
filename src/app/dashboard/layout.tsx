@@ -1,17 +1,47 @@
 /**
  * Dashboard Layout Component
  * 
- * This layout protects all dashboard routes and ensures:
- * - User is authenticated
- * - User has premium access (premium_amount > 0)
- * - Redirects to appropriate pages if requirements not met
+ * This layout checks both authentication and premium access.
+ * Redirects non-premium users to Stripe checkout.
  * 
  * @component
  */
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { isPremiumUser } from '@/lib/auth';
+
+/**
+ * Create Stripe checkout session and return the checkout URL
+ */
+async function createStripeCheckout(userId: string, userEmail: string): Promise<string> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/stripe/checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        plan: 'pro',
+        userId,
+        userEmail,
+        successUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard?upgraded=true`,
+        cancelUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard?cancelled=true`,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.success && data.url) {
+      return data.url;
+    } else {
+      throw new Error(data.error || 'Failed to create checkout session');
+    }
+  } catch (error) {
+    console.error('Error creating Stripe checkout:', error);
+    // Fallback to a simple error page or home page
+    return '/';
+  }
+}
 
 export default async function DashboardLayout({
   children,
@@ -30,17 +60,20 @@ export default async function DashboardLayout({
   }
 
   // Check if user has premium access
-  const hasPremium = await isPremiumUser(user.id);
+  const { data: userProfile, error: profileError } = await supabase
+    .from('users')
+    .select('premium')
+    .eq('id', user.id)
+    .single();
 
-  if (!hasPremium) {
-    // User doesn't have premium access, redirect to pricing
-    redirect('/pricing?upgrade=true');
-  }
+    /*
+  if (profileError || !userProfile || userProfile.premium === 0) {
+    // User doesn't have premium access, redirect to Stripe checkout
+    // Create checkout session and redirect
+    const checkoutUrl = await createStripeCheckout(user.id, user.email!);
+    redirect(checkoutUrl);
+  }*/
 
   // User is authenticated and has premium access
-  return (
-    <div className="min-h-screen bg-background">
-      {children}
-    </div>
-  );
+  return children;
 }

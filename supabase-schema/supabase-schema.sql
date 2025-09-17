@@ -7,9 +7,8 @@
 -- Run this script in your Supabase SQL Editor to set up the database.
 -- ============================================================================
 
--- Enable Row Level Security (RLS) on auth.users
--- This is already enabled by default in Supabase, but we're being explicit
-ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
+-- Note: auth.users table is managed by Supabase Auth and already has RLS enabled
+-- We don't need to modify it directly
 
 -- ============================================================================
 -- USERS TABLE (extends auth.users)

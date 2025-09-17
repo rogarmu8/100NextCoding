@@ -77,7 +77,7 @@ export default function Logo({
 
   if (href) {
     return (
-      <Link href={href} className="flex items-center">
+      <Link href={href} className="flex items-center cursor-pointer">
         {logoElement}
       </Link>
     );

@@ -1,11 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, Star } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function Hero() {
+  const { user, loading } = useAuth();
   return (
     <section className="bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center rounded border px-4 py-2 text-sm font-medium bg-blue-50 border-blue-200 mb-8">
             <Star className="h-4 w-4 text-blue-600 mr-2" />
@@ -22,12 +26,23 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button size="lg" asChild className="text-lg px-8 py-6">
-              <Link href="/auth/signup" className="flex items-center space-x-2">
-                <span>Get Started Free</span>
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-            </Button>
+            {loading ? (
+              <div className="h-14 w-48 bg-gray-200 animate-pulse rounded"></div>
+            ) : user ? (
+              <Button size="lg" asChild className="text-lg px-8 py-6">
+                <Link href="/dashboard" className="flex items-center space-x-2">
+                  <span>Enter The App</span>
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
+            ) : (
+              <Button size="lg" asChild className="text-lg px-8 py-6">
+                <Link href="/auth/signup" className="flex items-center space-x-2">
+                  <span>Get Started Free</span>
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
+            )}
             
             <Button variant="outline" size="lg" asChild className="text-lg px-8 py-6">
               <Link href="#demo" className="flex items-center space-x-2">
